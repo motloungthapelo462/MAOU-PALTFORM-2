@@ -29,6 +29,7 @@ const defaultPlatforms: SocialMediaPlatform[] = [
 ];
 
 const platformColors: Record<SocialMediaPlatform, string> = {
+  twitter: "from-sky-700 to-blue-900",
   x: "from-sky-700 to-blue-900",
   instagram: "from-pink-600 to-purple-800",
   tiktok: "from-black to-zinc-800",

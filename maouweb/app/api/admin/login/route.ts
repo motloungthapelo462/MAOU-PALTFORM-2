@@ -15,11 +15,11 @@ export async function POST(req: Request) {
 
   if (admin.role === "real") {
     if (!otp) {
-      const result = requestOtp(email);
+      const result = await requestOtp(email);
       return NextResponse.json({
         success: true,
         otpRequired: true,
-        message: `OTP sent to ${email}`,
+        message: result.message,
         debugCode: result.code,
       });
     }

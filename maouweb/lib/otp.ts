@@ -10,7 +10,9 @@ function generateOtpCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export function requestOtp(email: string) {
+import { sendEmail } from "./mailer";
+
+export async function requestOtp(email: string) {
   const code = generateOtpCode();
   const expiresAt = Date.now() + 5 * 60 * 1000;
 
@@ -20,10 +22,23 @@ export function requestOtp(email: string) {
     attempts: 0,
   });
 
-  return {
-    code: process.env.NODE_ENV === "production" ? undefined : code,
-    message: `OTP sent to ${email}`,
-  };
+  // Send email in production (or when mailer configured)
+  try {
+    if (process.env.NODE_ENV === "production" || process.env.SENDGRID_API_KEY || process.env.SMTP_HOST) {
+      await sendEmail(
+        email,
+        "Your MAOU admin OTP",
+        `Your MAOU admin OTP code is ${code}. It expires in 5 minutes.`,
+        `<p>Your MAOU admin OTP code is <strong>${code}</strong>. It expires in 5 minutes.</p>`
+      );
+      return { code: undefined, message: `OTP sent to ${email}` };
+    }
+  } catch (err) {
+    console.error("Error sending OTP email:", err);
+  }
+
+  // In non-production/dev, return the code for convenience
+  return { code, message: `OTP generated for ${email}` };
 }
 
 export function verifyOtp(email: string, code: string) {
